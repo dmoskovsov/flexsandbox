@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               minWidth="955"
+               minHeight="600"
+               preinitialize="Tide.getInstance().initApplication()">
+
+	<fx:Script>
+		<![CDATA[
+		import mx.utils.UIDUtil;
+
+		import org.granite.tide.BaseContext;
+		import org.granite.tide.Tide;
+		import org.granite.tide.events.TideContextEvent;
+		import org.granite.tide.events.TideUIConversationEvent;
+		import org.test.control.TabPM;
+		import org.test.view.TabView;
+
+		// Declare the conversation-scoped view and controller
+		Tide.getInstance().addComponents([ TabView, TabPM, GlobalModel ]);
+		// Dispatch a conversation start event
+		// First argument is the conversation id
+		// Second argument is the event type
+		private function openTab():void {
+			dispatchEvent(new TideUIConversationEvent(UIDUtil.createUID(), "createProductPM", null));
+		}
+
+		private function closeTab():void {
+			var tabView:TabView = TabView(viewStack.getItemAt(viewStack.selectedIndex));
+			var context:BaseContext = Tide.getInstance().getContext(tabView.conversationId);
+			context.meta_end();
+		}
+
+		// Generic observer that will add the current conversation view to the tab navigator
+		// when the conversation is created
+		[Observer("org.granite.tide.contextCreate")]
+		public function contextCreate(event:TideContextEvent):void {
+			var view:TabView = TabView(event.context.byType(TabView));
+			view.model = TabPM(event.context.byType(TabPM));
+			view.conversationId = event.context.contextId;
+			viewStack.addElement(view);
+			tabBar.selectedItem = view;
+		}
+
+		// Generic observer that will remove the view from the tab navigator
+		// when the conversation is ended
+		[Observer("org.granite.tide.contextDestroy")]
+		public function contextDestroy(event:TideContextEvent):void {
+			var view:TabView = event.context.byType(TabView) as TabView;
+			viewStack.removeElement(view);
+		}
+		]]>
+	</fx:Script>
+
+	<s:VGroup>
+		<s:Button label="open"
+		          click='openTab()'/>
+		<s:Button label="close"
+		          click='closeTab()'/>
+
+		<s:TabBar id="tabBar"
+		          dataProvider="{viewStack}"/>
+
+		<mx:ViewStack id="viewStack"
+		              borderStyle="solid"
+		              width="100%">
+		</mx:ViewStack>
+	</s:VGroup>
+</s:Application>

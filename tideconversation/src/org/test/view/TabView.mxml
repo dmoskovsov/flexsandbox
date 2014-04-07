@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009"
+                    xmlns:s="library://ns.adobe.com/flex/spark"
+                    label="{model.name + ' ' + conversationId}">
+	<fx:Metadata>
+		[Name("productView", scope="conversation")]
+	</fx:Metadata>
+
+	<fx:Script>
+		<![CDATA[
+		import org.test.control.TabPM;
+
+		[Bindable]
+		public var model:TabPM;
+		[Bindable]
+		public var conversationId:String;
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+
+	<s:Label text="{'pm name ' + model.name}"/>
+	<s:Label text="{'global name ' + model.model.name}"/>
+	<s:Label text="{'conversation id' + conversationId}"/>
+
+
+</s:NavigatorContent>
